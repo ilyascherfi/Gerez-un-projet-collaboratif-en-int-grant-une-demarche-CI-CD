@@ -1,0 +1,77 @@
+name: SonarCloud Analysis
+
+on:
+  workflow_run:
+    workflows: ["Unit Tests"]
+    types:
+      - completed
+
+jobs:
+  backend-sonar:
+    name: Back-end
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./back
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
+      - name: SonarCloud Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACKEND }}
+        run: mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          -Dsonar.projectKey=ilyas_bobapp_backend
+          -Dsonar.projectName=ilyas_bobapp_backend
+
+
+
+
+
+  frontend-sonar:
+    name: Front-end
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./front
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run frontend tests
+        run: npm run test -- --no-watch --browsers=ChromeHeadless --code-coverage
+
+      - name: Check coverage report exists
+        run: ls -la coverage/bobapp
+
+      - name: Check lcov info for jokes.service.ts
+        run: grep "jokes.service.ts" coverage/bobapp/lcov.info || echo "No coverage info for jokes.service.ts"
+
+
+
+      - uses: sonarsource/sonarqube-scan-action@v5
+        with:
+          projectBaseDir: front
+          args: >
+            -Dsonar.organization=ilyascherfi
+            -Dsonar.projectKey=ilyascherfi_bobapp_frontend
+            -Dsonar.sources=src/
+            -Dsonar.coverage.exclusions=**/*.spec.ts,src/environments/**,src/main.ts,src/test.ts
+            -Dsonar.inclusions=src/app/app.component.ts,src/app/services/jokes.service.ts
+            -Dsonar.javascript.lcov.reportPaths=./coverage/bobapp/lcov.info
+
+
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONTEND }}
