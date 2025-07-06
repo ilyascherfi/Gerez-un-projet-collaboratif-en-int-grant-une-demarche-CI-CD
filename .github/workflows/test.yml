@@ -24,6 +24,7 @@ jobs:
         with:
           name: Jacoco Reports
           path: back/target/site/jacoco/
+
   frontend-unit-tests:
     name: Front-end
     runs-on: ubuntu-latest
