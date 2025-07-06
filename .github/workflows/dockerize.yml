@@ -1,11 +1,9 @@
 name: Dockerize and Push to Docker Hub
-
 on:
   workflow_run:
     workflows: ["Unit Tests"]
     types:
       - completed
-
 jobs:
   dockerize-backend:
     name: Build & Push Back-end Docker Image
@@ -14,15 +12,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
       - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKERHUB_TOKEN}}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
       - name: Build Back-end image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ilyas1991/bobapp-back:latest  ./back
-
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/bobapp-back:latest ./back
+        # Assurez-vous que le nom de l'image est correct et cohérent avec votre dépôt Docker Hub
       - name: Push Back-end image to Docker Hub
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/ilyas1991/bobapp-back:latest
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/bobapp-back:latest
+        # Assurez-vous que le nom de l'image est correct et cohérent avec votre dépôt Docker Hub
 
   dockerize-frontend:
     name: Build & Push Front-end Docker Image
@@ -31,12 +28,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
       - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKERHUB_TOKEN}}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
       - name: Build Front-end image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ilyas1991/bobapp-front:latest  ./front
-
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/bobapp-front:latest ./front
+        # J'ai supprimé "ilyas1991/" pour uniformiser le format du nom de l'image avec celui du back-end
       - name: Push Front-end image to Docker Hub
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/ilyas1991/bobapp-front:latest
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/bobapp-front:latest
+        # J'ai supprimé "ilyas1991/" pour uniformiser le format du nom de l'image avec celui du back-end
