@@ -1,11 +1,9 @@
 name: SonarCloud Analysis
-
 on:
   workflow_run:
     workflows: ["Unit Tests"]
     types:
       - completed
-
 jobs:
   backend-sonar:
     name: Back-end
@@ -42,14 +40,19 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20
+
       - name: Install dependencies
         run: npm ci
+
       - name: Run frontend tests
         run: npm run test -- --no-watch --browsers=ChromeHeadless --code-coverage
+
       - name: Check coverage report exists
         run: ls -la coverage/bobapp
+
       - name: Check lcov info for jokes.service.ts
         run: grep "jokes.service.ts" coverage/bobapp/lcov.info || echo "No coverage info for jokes.service.ts"
+
       - uses: sonarsource/sonarqube-scan-action@v5
         with:
           projectBaseDir: front
@@ -59,6 +62,8 @@ jobs:
             -Dsonar.sources=src/
             -Dsonar.coverage.exclusions=**/*.spec.ts,src/environments/**,src/main.ts,src/test.ts
             -Dsonar.inclusions=src/app/app.component.ts,src/app/services/jokes.service.ts
-            -Dsonar.javascript.lcov.reportPaths=./coverage/bobapp/lcov.info
+            -Dsonar.javascript.lcov.reportPaths=coverage/bobapp/lcov.info
+
+
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONTEND }}
