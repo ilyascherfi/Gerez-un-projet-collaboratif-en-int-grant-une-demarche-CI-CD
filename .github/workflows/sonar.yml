@@ -64,6 +64,5 @@ jobs:
             -Dsonar.inclusions=src/app/app.component.ts,src/app/services/jokes.service.ts
             -Dsonar.javascript.lcov.reportPaths=coverage/bobapp/lcov.info
 
-
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONTEND }}
